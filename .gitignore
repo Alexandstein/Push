@@ -1,0 +1,16 @@
+
+*.pyc
+
+targetTest/target.txt
+
+targetTest/target2.txt
+
+targetTest/target3.txt
+
+pushfile
+
+test
+
+tt.txt
+
+test2

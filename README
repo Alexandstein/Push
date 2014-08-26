@@ -1,0 +1,66 @@
+===Preface===
+Push is just a very simple and lightweight file pushing and synchronization program I am
+developing on my own time. Its appearence and conventions are mostly inspired by makefiles
+though it's not nearly as sophisticated in depth since it is more lightweight. More features
+will be added later to make this more practically useful.
+
+There are probably already many programs like this one like Make itself, but I decided to
+try and make my own simple file "builder" as a personal project. And also to help me
+move files around my own computer to places where they may be needed, since a lot of my projects
+are in their own developmental directories.
+
+I decided to make this because I was doing a lot of manual copying and pasting with and
+without the Terminal, but was using files that were too lightweight in project usage to
+need full featured build programs like Make or Grunt. (Think relatively small Javascript files
+and their associated HTML and CSS files for simple-page apps.)
+
+===Features Thus Far===
+-Push from the current directory to all the needed directories.
+-Ability to specify build targets with their own sets of instructions. 
+-Ability to nest target commands (Take care to avoid cycles and infinite loops!)
+-Specify files from the source directory to concatenate together in the output files.
+-Specify flags to change behavior. (No flags are currently implemented)
+
+===Usage===
+Execution: push.py [target] [-f pushfile]
+
+Both target and pushfile are optional arguments. Using only `push.py [target]` the program will
+default to looking for a file in the current directory called `pushfile` (a la Make). If a target
+is not specified, the program will look for a target named `main`. If `main` or a specified
+target is not found then an error will be displayed. 
+
+===Syntax===
+
+#This is a comment
+#At this moment in development the pound sign needs to be the first non-whitespace character
+#in a commented line
+
+#This is a target declaration
+#Indent to put commands underneath a target, like usual
+#Target declarations are alphanumeric labels (plus underscores) with no spaces in them.
+
+target1
+	#Simple command moves the file from one directory to a target directory
+	#Flags are given using a pipe (|) and a string of characters specifying options
+	#The => operator tells the program to move the files on the right to the outputs on the left
+	./input.txt => ~/test/example/output.txt | abcdefg
+	
+makeBreakfast
+	#Concatenate files for outputting as well, and specify multiple output destinations
+	#on a single line using the + operator.
+	input.java + input2.java => ../targetDir/final.java
+	cream.js + bagel.js + jam.js => ../targetDir/other.js + /food/breakfast.js
+	
+food_and_stuff
+	#Can execute other targets by using `:targetName`
+	#Targets cannot accept flags and will cause syntax errors.
+	:makebreakfast
+	moreWork.js => /final/frumbleTacos.js
+	
+
+==Changelog and Notes==
+-0.1:	08:25:2014
+	Initial commit. Very basic features and rough skeleton for the program. Will need
+	cleaning up and debugging.
+	
+2014 Alexander Stein
