@@ -19,7 +19,7 @@ and their associated HTML and CSS files for simple-page apps.)
 -Ability to specify build targets with their own sets of instructions. 
 -Ability to nest target commands (Take care to avoid cycles and infinite loops!)
 -Specify files from the source directory to concatenate together in the output files.
--Specify flags to change behavior. (No flags are currently implemented)
+-Specify flags to change behavior. (Only one flag implemented so far)
 
 ===Usage===
 Execution: push.py [target] [-f pushfile]
@@ -57,10 +57,12 @@ food_and_stuff
 	:makebreakfast
 	moreWork.js => /final/frumbleTacos.js
 	
+===Flags===
+x: Gives outputs owner execute permissions
 
 ==Changelog and Notes==
 -0.1:	08:25:2014
 	Initial commit. Very basic features and rough skeleton for the program. Will need
 	cleaning up and debugging.
-	
+
 2014 Alexander Stein

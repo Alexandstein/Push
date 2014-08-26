@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+import stat
 import argparse
 
 class PusherCommand(object):
@@ -37,6 +38,7 @@ class PusherCommand(object):
 		'''
 		self.inputs = []
 		self.outputs = []
+		self.options = ''
 		
 		#Validate whether command is valid. If not, raise exception
 		if not isValidCommand(line):
@@ -77,10 +79,10 @@ class PusherCommand(object):
 		except
 			ValueError
 		'''
-		if flag.length != 1:
+		if len(flag) != 1:
 			raise ValueError('Flag needs to be a single character')
 		else:
-			return bool(re.search(flag, command.options))
+			return bool(re.search(flag, self.options))
 		
 	#Getters and setters
 	@property
@@ -173,26 +175,19 @@ class Pusher(object):
 		description
 			Constructor
 		args
-			(file)(string) pushFile:
-				A file, or filename containing the push commands
+			(string) pushFile:
+				A file containing the push commands
 		except
 			ValueError
 		'''
 		self.commands = {}
 		self.targets = []
-		
-		fileText = ''
-		try:
-			pushFile.read()
-		#Not a file, check if string path
-		except AttributeError:
-			pushFile = open(pushFile, 'r+')
+		pushFile = open(pushFile, 'r')
 		#Line number counter
 		i = 0
 		currentTarget = ''
 		for line in pushFile:
 			i += 1
-			
 			#skip line if comments or whitespace
 			if (line == '') or re.match('^[\s]*#', line) or re.match('^\s*$', line):
 				continue
@@ -224,7 +219,7 @@ class Pusher(object):
 			ValueError
 		'''
 		if target not in self.targets:
-				raise ValueError('Error: Cannot execute target `'+ target +'`; does not exist.')
+			raise ValueError('Error: Cannot execute target `'+ target +'`; does not exist.')
 		for command in self.commands[target]:
 			#Check if target or not to choose proper exec function
 			if command.isTarget:
@@ -254,9 +249,9 @@ class Pusher(object):
 				raise IOError('Error on line ' + str(command.line[0]) + ': ' + e.message + ' Input file not found.')
 		for filename in command.outputs:
 			try:
-				outputFiles.append(open(filename, 'w'))
+				outputFiles.append(open(filename, 'w+'))
 			except IOError as e:
-				raise IOError('Error on line ' + str(command.line[0]) + ': ' + e.message + ' Output Directory not found.')
+				print e
 		
 		#Begin pasting files together for output.
 		for file in inputFiles:
@@ -264,6 +259,13 @@ class Pusher(object):
 		#Write to output files and close
 		for file in outputFiles:
 			file.write(outputText)
+				
+			#If option x is present, make permissions executable
+			if command.hasOption('x'):
+				fileState = os.stat(file.name)
+				os.chmod(file.name, fileState.st_mode | stat.S_IEXEC)
+			file.close()
+			
 		
 #Helpers
 def isValidCommand(line):
@@ -308,7 +310,7 @@ if __name__ == '__main__':
 	
 	if not os.path.isfile(args.pushfile):
 		print 'Push: Error: pushfile `%s` not found.' % args.pushfile 
-	
+		exit(-1)
 	try:
 		pusher = Pusher(args.pushfile)
 		pusher.executeTarget(args.target)
